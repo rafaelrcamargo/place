@@ -1,6 +1,6 @@
 import { RefObject, useEffect, useRef } from "react"
 
-const PER_LINE = 500
+const PER_LINE = 1000
 const SIZE = 1
 
 const palette = [

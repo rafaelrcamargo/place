@@ -22,7 +22,11 @@ My starting point was the [r/place](https://www.reddit.com/r/place/) subreddit. 
 
 #### The canvas
 
-The canvas is a 1000x1000 grid, but for artistic reasons, I decided to make this in a smaller scale, not the original 50x50 for pixel downscaled as the original. I decided to make it 10x10, so the canvas is upscaled and the pixels are bigger kept in memory, that way, we skip the whole image creation process and keep a reasonable performance.
+The canvas starts as a 1000x1000 grid, but for artistic reasons, I decided to make this in a smaller scale, not the original 50x50 for pixel downscaled like the original. I went for a 1x1, so a real pixel basically, then the canvas is up scaled for the nature of being made by pixels the resolution doesn't really matters here, that way, we skip the whole image creation process and keep a reasonable performance.
+
+> So... Maybe I figured out why they went with the image approach...
+> Turns out rendering millions of pixels is not that easy, who would have thought?
+> For now I'm optimizing the rendering process, but I'm not sure if I can get to a reasonable performance.
 
 #### The infrastructure
 

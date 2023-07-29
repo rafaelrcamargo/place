@@ -3,7 +3,7 @@
 import { useCanvas } from "@/utils/canvas"
 import { useEffect, useState } from "react"
 
-const SIZE = 500
+const SIZE = 1000
 const SCALE = 1
 
 let clicked = false
