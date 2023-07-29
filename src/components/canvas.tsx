@@ -25,35 +25,60 @@ export const Canvas = () => {
 
     // BC we change them more often than react do re-render
     let scaleFactor = scale
+    let pinchDistance = 0
     let iX = 0,
       iY = 0 // initial mouse position
 
     // Pan
-    const handleInteractionEnd = () => (clicked = false)
+    const handleInteractionEnd = () => ((clicked = false), (pinchDistance = 0))
     const handleInteractionStart = (e: MouseEvent | TouchEvent) => {
-      const event = e instanceof MouseEvent ? e : e.touches[0]!
+      if (e instanceof TouchEvent && e.touches.length === 2) {
+        const touch1 = e.touches[0]!
+        const touch2 = e.touches[1]!
+        pinchDistance = Math.hypot(
+          touch1.clientX - touch2.clientX,
+          touch1.clientY - touch2.clientY
+        )
+      } else {
+        const event = e instanceof MouseEvent ? e : e.touches[0]!
 
-      clicked = true
-      iX = event.clientX
-      iY = event.clientY
+        clicked = true
+        iX = event.clientX
+        iY = event.clientY
+      }
     }
     const handleInteractionMove = (e: MouseEvent | TouchEvent) => {
-      if (!clicked) return
+      if (clicked) {
+        const event = e instanceof MouseEvent ? e : e.touches[0]
+        const { clientX: x, clientY: y } = event!
+        const dX = x - iX
+        const dY = y - iY
 
-      const event = e instanceof MouseEvent ? e : e.touches[0]!
-      const { clientX: x, clientY: y } = event
-      const dX = x - iX // Delta X
-      const dY = y - iY // Delta Y
+        iX = x
+        iY = y
 
-      // Update initial mouse position
-      iX = x
-      iY = y
+        setPosition(({ x, y }) => ({
+          x: x + dX / scaleFactor,
+          y: y + dY / scaleFactor,
+        }))
+      } else if (e instanceof TouchEvent && e.touches.length === 2) {
+        const touch1 = e.touches[0]!
+        const touch2 = e.touches[1]!
+        const newPinchDistance = Math.hypot(
+          touch1.clientX - touch2.clientX,
+          touch1.clientY - touch2.clientY
+        )
 
-      // Apply the translation & divide by the scale factor to keep the translation constant
-      setPosition(({ x, y }) => ({
-        x: x + dX / scaleFactor,
-        y: y + dY / scaleFactor,
-      }))
+        setScale(scale => {
+          const NEW = Math.max(
+            0.8,
+            Math.min(20, scale * (newPinchDistance / pinchDistance))
+          )
+          scaleFactor = NEW
+          pinchDistance = newPinchDistance
+          return NEW
+        })
+      }
     }
 
     // Zoom
@@ -86,13 +111,13 @@ export const Canvas = () => {
     if (isMobile) {
       // Pan - Mobile
       canvas.addEventListener("touchstart", handleInteractionStart)
-      canvas.addEventListener("touchmove", handleInteractionMove)
-      canvas.addEventListener("touchend", handleInteractionEnd)
+      document.addEventListener("touchmove", handleInteractionMove)
+      document.addEventListener("touchend", handleInteractionEnd)
     } else {
       // Pan - Desktop
       canvas.addEventListener("mousedown", handleInteractionStart)
-      canvas.addEventListener("mousemove", handleInteractionMove)
-      canvas.addEventListener("mouseup", handleInteractionEnd)
+      document.addEventListener("mousemove", handleInteractionMove)
+      document.addEventListener("mouseup", handleInteractionEnd)
 
       // Zoom
       document.addEventListener("wheel", handleWheel)
@@ -102,13 +127,13 @@ export const Canvas = () => {
       if (isMobile) {
         // Pan - Mobile
         canvas.removeEventListener("touchstart", handleInteractionStart)
-        canvas.removeEventListener("touchmove", handleInteractionMove)
-        canvas.removeEventListener("touchend", handleInteractionEnd)
+        document.removeEventListener("touchmove", handleInteractionMove)
+        document.removeEventListener("touchend", handleInteractionEnd)
       } else {
         // Pan - Desktop
         canvas.removeEventListener("mousedown", handleInteractionStart)
-        canvas.removeEventListener("mousemove", handleInteractionMove)
-        canvas.removeEventListener("mouseup", handleInteractionEnd)
+        document.removeEventListener("mousemove", handleInteractionMove)
+        document.removeEventListener("mouseup", handleInteractionEnd)
 
         // Zoom
         document.removeEventListener("wheel", handleWheel)
