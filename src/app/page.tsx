@@ -1,9 +1,7 @@
 import { Canvas } from "@/components/canvas"
 
-export default () => {
-  return (
-    <main className="flex h-screen">
-      <Canvas />
-    </main>
-  )
-}
+export default () => (
+  <main className="flex h-screen">
+    <Canvas />
+  </main>
+)
