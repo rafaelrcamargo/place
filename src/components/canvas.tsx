@@ -3,31 +3,33 @@
 import { useCanvas } from "@/utils/canvas"
 import { useEffect, useState } from "react"
 
-const SIZE = 1000
+const SIZE = 500
 const SCALE = 1
 
 let clicked = false
+const universe = new Array(SIZE * SIZE)
+  .fill(0)
+  .map(() => Math.round(Math.random() * 15))
 
 export const Canvas = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
 
-  const universe = new Array(SIZE * SIZE)
-    .fill(0)
-    .map(() => Math.round(Math.random() * 15))
   const { ref } = useCanvas(universe, SIZE)
 
   useEffect(() => {
     const canvas = document.querySelector("canvas")
     if (!canvas) return // No canvas, no fun
 
+    const isMobile = window.innerWidth < 768
+
     // BC we change them more often than react do re-render
     let scaleFactor = scale
     let iX = 0,
       iY = 0 // initial mouse position
 
+    // Pan
     const handleInteractionEnd = () => (clicked = false)
-
     const handleInteractionStart = (e: MouseEvent | TouchEvent) => {
       const event = e instanceof MouseEvent ? e : e.touches[0]!
 
@@ -35,7 +37,6 @@ export const Canvas = () => {
       iX = event.clientX
       iY = event.clientY
     }
-
     const handleInteractionMove = (e: MouseEvent | TouchEvent) => {
       if (!clicked) return
 
@@ -82,47 +83,53 @@ export const Canvas = () => {
       })
     }
 
-    // Pan - Desktop
-    canvas.addEventListener("mousedown", handleInteractionStart)
-    canvas.addEventListener("mousemove", handleInteractionMove)
-    canvas.addEventListener("mouseup", handleInteractionEnd)
-
-    // Pan - Mobile
-    canvas.addEventListener("touchstart", handleInteractionStart)
-    canvas.addEventListener("touchmove", handleInteractionMove)
-    canvas.addEventListener("touchend", handleInteractionEnd)
-
-    // Zoom
-    document.addEventListener("wheel", handleWheel)
-
-    return () => {
-      // Pan - Desktop
-      canvas.removeEventListener("mousedown", handleInteractionStart)
-      canvas.removeEventListener("mousemove", handleInteractionMove)
-      canvas.removeEventListener("mouseup", handleInteractionEnd)
-
+    if (isMobile) {
       // Pan - Mobile
-      canvas.removeEventListener("touchstart", handleInteractionStart)
-      canvas.removeEventListener("touchmove", handleInteractionMove)
-      canvas.removeEventListener("touchend", handleInteractionEnd)
+      canvas.addEventListener("touchstart", handleInteractionStart)
+      canvas.addEventListener("touchmove", handleInteractionMove)
+      canvas.addEventListener("touchend", handleInteractionEnd)
+    } else {
+      // Pan - Desktop
+      canvas.addEventListener("mousedown", handleInteractionStart)
+      canvas.addEventListener("mousemove", handleInteractionMove)
+      canvas.addEventListener("mouseup", handleInteractionEnd)
 
       // Zoom
-      document.removeEventListener("wheel", handleWheel)
+      document.addEventListener("wheel", handleWheel)
+    }
+
+    return () => {
+      if (isMobile) {
+        // Pan - Mobile
+        canvas.removeEventListener("touchstart", handleInteractionStart)
+        canvas.removeEventListener("touchmove", handleInteractionMove)
+        canvas.removeEventListener("touchend", handleInteractionEnd)
+      } else {
+        // Pan - Desktop
+        canvas.removeEventListener("mousedown", handleInteractionStart)
+        canvas.removeEventListener("mousemove", handleInteractionMove)
+        canvas.removeEventListener("mouseup", handleInteractionEnd)
+
+        // Zoom
+        document.removeEventListener("wheel", handleWheel)
+      }
     }
   }, [])
 
   return (
-    <canvas
-      ref={ref}
-      width={SIZE * SCALE}
-      height={SIZE * SCALE}
-      className="fixed touch-none select-none border border-zinc-700"
-      style={{
-        willChange: "transform",
-        imageRendering: "pixelated",
-        transformOrigin: "top left",
-        transform: `scale(${scale}) translate3d(${position.x}px, ${position.y}px, 0)`,
-      }}
-    />
+    <div className="touch-none select-none border border-zinc-700">
+      <canvas
+        ref={ref}
+        width={SIZE * SCALE}
+        height={SIZE * SCALE}
+        style={{
+          position: "fixed",
+          willChange: "transform",
+          imageRendering: "pixelated",
+          transformOrigin: "top left",
+          transform: `scale(${scale}) translate3d(${position.x}px, ${position.y}px, 0)`,
+        }}
+      />
+    </div>
   )
 }
