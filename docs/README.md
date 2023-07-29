@@ -36,4 +36,4 @@ That's a cool one, my first thought was to create something scalable to the tens
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License see the [LICENSE](../LICENSE) file for details.
