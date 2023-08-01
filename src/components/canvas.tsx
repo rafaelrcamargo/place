@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-import PinchZoom from "@/libs/pinch-zoom"
+import PinchZoom from "@/libs/pinch-zoom/new"
 import { useCanvas } from "@/utils/canvas"
 
 const SIZE = 1000
@@ -18,7 +18,7 @@ export const Canvas = () => {
     const canvas = document.querySelector("canvas")
     if (!canvas) return // No canvas, no fun
 
-    new PinchZoom(canvas, {
+    const pz = new PinchZoom(canvas, {
       useMouseWheel: true,
       maxZoom: 20,
       minZoom: 0.8,
@@ -27,6 +27,8 @@ export const Canvas = () => {
       horizontalPadding: 500,
       draggableUnzoomed: true,
     })
+
+    return () => pz.destroy()
   }, [])
 
   return (

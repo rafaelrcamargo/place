@@ -1,6 +1,6 @@
 type PinchZoomEventHandler = (target: PinchZoom, event: TouchEvent) => void
 
-declare interface IPinchZoomOptions {
+export interface PinchZoomOptions {
   tapZoomFactor?: number
   zoomOutFactor?: number
   animationDuration?: number
@@ -24,7 +24,7 @@ declare interface IPinchZoomOptions {
 }
 
 declare class PinchZoom {
-  constructor(element: HTMLElement, options?: IPinchZoomOptions)
+  constructor(element: HTMLElement, options?: PinchZoomOptions)
   public enable(): void
   public disable(): void
   public destroy(): void

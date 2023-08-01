@@ -16,6 +16,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "noImplicitAny": true,
+    "noImplicitThis": false,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
@@ -27,6 +28,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/libs/pinch-zoom/new.js"],
   "exclude": ["node_modules"]
 }
